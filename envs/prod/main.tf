@@ -3,13 +3,28 @@ data "terraform_remote_state" "route53" {
 
   config = {
     bucket = "terraform-state"
-    key    = "global/route53/terraform.tfstate"
+    key    = "global/route53-ssm/terraform.tfstate"
     region = "eu-north-1"
   }
 }
 
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
+}
+
+module "ssm" {
+  source = "../../modules/ssm"
+
+  name = local.name_prefix
+  env = var.environment
+  parameters = {
+    "SSM_PARAMS_NAME" = {
+      description = "short description"
+      type        = "String | SecureString"
+      placeholder = "the value will be set manually on the aws console or via GitHub secrets"
+    }
+  }
+  tags = var.tags
 }
 
 module "vpc" {
