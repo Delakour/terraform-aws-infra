@@ -1,7 +1,7 @@
 variable "project_name" {
   type        = string
   description = "Base project name"
-  default     = "parpar"
+  default     = "project-name"
 }
 
 variable "environment" {
@@ -10,15 +10,15 @@ variable "environment" {
 }
 variable "hosted_zone_id" {
   type        = string
-  description = "Route53 hosted zone ID for parparsoftware.com"
-  default = "parparsoftware.com"
+  description = "Route53 hosted zone ID for domain.com"
+  default = "domain.com"
 }
 
 variable "tags" {
   type = map(string)
   default = {
-    Owner       = "parpar"
-    Project     = "parpar-mvp"
+    Owner       = "owner-name"
+    Project     = "project-name"
     Environment = "global"
   }
 }

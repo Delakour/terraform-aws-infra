@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "parameter" {
   for_each = var.parameters
 
-  name        = "/parpar/${var.env}/${each.key}"
+  name        = "/company/${var.env}/${each.key}"
   description = each.value.description
   type        = each.value.type
   value = coalesce(
