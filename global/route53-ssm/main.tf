@@ -7,7 +7,7 @@ module "ssm" {
   source = "../../modules/ssm"
 
   name = "${var.project_name}-${var.environment}"
-  env = var.environment
+  env  = var.environment
   parameters = {
     "SSM_PARAMS_NAME" = {
       description = "short description"

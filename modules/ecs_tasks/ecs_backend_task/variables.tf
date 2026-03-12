@@ -21,14 +21,12 @@ variable "ecr_repo_url" {
   type        = string
 }
 
-variable "qdrant_url" {
-  description = "The URL of the Qdrant service"
-  type        = string
-}
-
-variable "qdrant_api_key" {
-  description = "The API key for Qdrant"
-  type        = string
+variable "ssm_params" {
+  description = "List of SSM parameters to be used as secrets in the ECS task"
+  type = list(object({
+    name      = string
+    valueFrom = string
+  }))
 }
 
 variable "log_group_name" {
@@ -36,9 +34,24 @@ variable "log_group_name" {
   type        = string
 }
 
-variable "cluster_id" {
-  description = "The ID of the ECS cluster"
+variable "cluster_arn" {
+  description = "The ECS cluster ID"
   type        = string
+}
+
+variable "cluster_name" {
+  description = "The ECS cluster name"
+  type = string
+}
+
+variable "min_instances" {
+  description = "minimum instances of task running"
+  type = number
+}
+
+variable "max_instances" {
+  description = "maximum instances of task running"
+  type = number
 }
 
 variable "private_subnet_ids" {

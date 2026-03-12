@@ -8,15 +8,11 @@ data "terraform_remote_state" "route53" {
   }
 }
 
-locals {
-  name_prefix = "${var.project_name}-${var.environment}"
-}
-
 module "ssm" {
   source = "../../modules/ssm"
 
   name = local.name_prefix
-  env = var.environment
+  env  = var.environment
   parameters = {
     "SSM_PARAMS_NAME" = {
       description = "short description"
@@ -75,20 +71,47 @@ module "cloudwatch_logs" {
 }
 
 module "ecs_backend" {
-  source = "../../modules/ecs_backend"
+  source = "../../modules/ecs_tasks/ecs_backend_task"
 
   name                = local.name_prefix
   region              = var.aws_region
   environment         = var.environment
   image_tag           = var.environment
   ecr_repo_url        = module.ecr.repository_url
-  qdrant_url          = var.qdrant_url
-  qdrant_api_key      = var.qdrant_api_key
+  ssm_params          = local.backend_secrets
   log_group_name      = "/ecs/${local.name_prefix}-backend-logs"
-  cluster_id          = module.ecs_cluster.cluster_id
+  cluster_arn          = module.ecs_cluster.cluster_arn
+  cluster_name        = module.ecs_cluster.cluster_name
+  min_instances       = 1
+  max_instances       = 3
   private_subnet_ids  = module.vpc.private_subnet_ids
   backend_tasks_sg_id = module.security.backend_sg_id
   target_group_arn    = module.alb.target_group_arn
+
+  tags = var.tags
+}
+
+module "ecs_rag_weekly_update" {
+  source = "../../modules/ecs_tasks/ecs_rag_weekly_task"
+
+  name           = local.name_prefix
+  region         = var.aws_region
+  environment    = var.environment
+  ssm_params     = local.backend_secrets
+  log_group_name = "/ecs/${local.name_prefix}-backend-logs"
+  backend_image  = local.backend_image
+
+  tags = var.tags
+}
+
+module "eventbridge_rag_weekly_update" {
+  source = "../../modules/eventbridge"
+
+  name                    = local.name_prefix
+  cluster_arn             = module.ecs_cluster.cluster_arn
+  ecs_task_definition_arn = module.ecs_rag_weekly_update.task_definition_arn
+  private_subnet_ids      = module.vpc.private_subnet_ids
+  ecs_tasks_sg_id         = module.security.backend_sg_id
 
   tags = var.tags
 }

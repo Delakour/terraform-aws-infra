@@ -1,0 +1,70 @@
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_role" "execution" {
+  name = "${var.name}-ecs-rag-weekly-update-execution"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "execution_managed" {
+  role       = aws_iam_role.execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy" "execution_ssm" {
+  name = "${var.name}-ecs-rag-weekly-update-execution-ssm"
+  role = aws_iam_role.execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "kms:Decrypt"
+      ]
+      Resource = [
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/global/*",
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/${var.environment}/*"
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role" "task" {
+  name = "${var.name}-ecs-rag-weekly-update-task"
+
+  assume_role_policy = aws_iam_role.execution.assume_role_policy
+}
+
+resource "aws_iam_role_policy" "task_policy" {
+  name = "${var.name}-ecs-rag-weekly-update-task"
+  role = aws_iam_role.task.id
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject",
+            "s3:ListBucket"
+          ],
+          "Resource" : "*"
+        }
+      ]
+    }
+  )
+}

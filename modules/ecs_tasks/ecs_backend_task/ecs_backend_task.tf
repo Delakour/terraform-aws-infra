@@ -18,23 +18,7 @@ resource "aws_ecs_task_definition" "backend_task" {
       protocol      = "tcp"
     }]
 
-    environment = [
-      { name = "QDRANT_URL", value = var.qdrant_url },
-      { name = "QDRANT_API_KEY", value = var.qdrant_api_key }
-    ]
-
-    secrets = [
-      { name = "MONGODB_URL", valueFrom = "/${var.environment}/MONGODB_URL" },
-      { name = "MONGODB_NAME", valueFrom = "/global/MONGODB_NAME" },
-      { name = "DATABASE_NAME", valueFrom = "/global/DATABASE_NAME" },
-      { name = "OPENAI_API_KEY", valueFrom = "/global/OPENAI_API_KEY" },
-      { name = "FERNET_KEY", valueFrom = "/global/FERNET_KEY" },
-      { name = "AWS_REGION", valueFrom = "/global/AWS_REGION" },
-      { name = "S3_LOCAL_FOLDER_NAME", valueFrom = "/${var.environment}/S3_LOCAL_FOLDER_NAME" },
-      { name = "S3_BRANDBOOK_NAME", valueFrom = "/${var.environment}/S3_BRANDBOOK_NAME" },
-      { name = "S3_STORYPORTAL_NAME", valueFrom = "/${var.environment}/S3_STORYPORTAL_NAME" },
-      { name = "GEMINI_API_KEY", valueFrom = "/global/GEMINI_API_KEY" },
-    ]
+    secrets = var.ssm_params
 
     logConfiguration = {
       logDriver = "awslogs"
@@ -49,9 +33,9 @@ resource "aws_ecs_task_definition" "backend_task" {
 
 resource "aws_ecs_service" "backend_service" {
   name            = "${var.name}-backend-service"
-  cluster         = var.cluster_id
+  cluster         = var.cluster_arn
   task_definition = aws_ecs_task_definition.backend_task.arn
-  desired_count   = 1
+  desired_count   = var.min_instances
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -67,4 +51,28 @@ resource "aws_ecs_service" "backend_service" {
   }
 
   health_check_grace_period_seconds = 60
+}
+
+
+resource "aws_appautoscaling_target" "ecs" {
+  max_capacity       = var.max_instances
+  min_capacity       = var.min_instances
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.backend_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_cpu_policy" {
+  name               = "${var.name}-cpu-scaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value = 60
+  }
 }

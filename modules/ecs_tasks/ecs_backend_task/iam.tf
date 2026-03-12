@@ -29,11 +29,12 @@ resource "aws_iam_role_policy" "execution_ssm" {
       Action = [
         "ssm:GetParameter",
         "ssm:GetParameters",
-        "ssm:GetParametersByPath"
+        "ssm:GetParametersByPath",
+        "kms:Decrypt"
       ]
       Resource = [
-        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/global/*",
-        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/*"
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/global/*",
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/${var.environment}/*"
       ]
     }]
   })

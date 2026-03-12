@@ -71,18 +71,6 @@ variable "health_check_path" {
   default     = "/health"
 }
 
-variable "qdrant_url" {
-  type        = string
-  description = "The URL of the Qdrant service"
-  default     = ""
-}
-
-variable "qdrant_api_key" {
-  type        = string
-  description = "The API key for the Qdrant service"
-  default     = ""
-}
-
 variable "frontend_domain" {
   type        = string
   description = "Frontend domain"
