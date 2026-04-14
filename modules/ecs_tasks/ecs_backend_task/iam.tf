@@ -63,3 +63,24 @@ resource "aws_iam_role_policy" "task_s3" {
     }]
   })
 }
+
+resource "aws_iam_role_policy" "task_ecs_exec" {
+  name = "${var.name}-ecs-exec"
+  role = aws_iam_role.task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}

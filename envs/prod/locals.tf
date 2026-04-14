@@ -18,6 +18,7 @@ locals {
     { name = "S3_STORYPORTAL_BUCKET_NAME", valueFrom = "/company/${var.environment}/S3_STORYPORTAL_BUCKET_NAME" },
     { name = "GOOGLE_JAVASCRIPT_ORIGINS", valueFrom = "/company/${var.environment}/GOOGLE_JAVASCRIPT_ORIGINS" },
     { name = "GOOGLE_REDIRECT_URIS", valueFrom = "/company/${var.environment}/GOOGLE_REDIRECT_URIS" },
+    { name = "RAG_CREATE_QUEUE_URL", valueFrom = "/company/${var.environment}/RAG_CREATE_QUEUE_URL" },
     # global ssm
     { name = "AWS_ACCESS_KEY_ID", valueFrom = "/company/global/AWS_ACCESS_KEY_ID" },
     { name = "AWS_REGION", valueFrom = "/company/global/AWS_REGION" },

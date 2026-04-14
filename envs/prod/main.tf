@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "terraform_remote_state" "route53" {
   backend = "s3"
 
@@ -7,6 +9,7 @@ data "terraform_remote_state" "route53" {
     region = "eu-north-1"
   }
 }
+
 module "ssm" {
   source = "../../modules/ssm"
 
@@ -30,16 +33,26 @@ module "vpc" {
   azs             = var.availability_zones
   public_subnets  = var.public_subnet_cidrs
   private_subnets = var.private_subnet_cidrs
-
-  tags = var.tags
+  tags            = var.tags
 }
 
-resource "aws_route" "private_to_atlas" {
-  route_table_id = module.vpc.private_route_table_id
+module "atlas_vpc_peering" {
+  source = "../../modules/atlas_vpc_peering"
 
-  # ⚠️ Note that these two variables - their values are hardocoded in envs/prod/variables.tf
-  destination_cidr_block    = var.atlas_vpc_cidr
-  vpc_peering_connection_id = var.atlas_peering_connection_id
+  name             = local.name_prefix
+  atlas_project_id = var.atlas_project_id
+  atlas_region     = var.atlas_region
+  atlas_cidr_block = var.atlas_cidr_block
+
+  aws_region      = var.aws_region
+  aws_account_id  = data.aws_caller_identity.current.account_id
+  vpc_id          = module.vpc.vpc_id
+  vpc_cidr_block  = module.vpc.vpc_cidr_block
+  route_table_ids = [module.vpc.private_route_table_id]
+
+  create_atlas_ip_access_list = true
+
+  tags = var.tags
 }
 
 module "security" {
@@ -121,6 +134,13 @@ module "eventbridge_rag_weekly_update" {
   private_subnet_ids      = module.vpc.private_subnet_ids
   ecs_tasks_sg_id         = module.security.backend_sg_id
 
+  tags = var.tags
+}
+
+module "sqs_rag_create" {
+  source = "../../modules/sqs"
+
+  name = local.name_prefix
   tags = var.tags
 }
 

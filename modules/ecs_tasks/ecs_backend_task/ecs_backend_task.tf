@@ -38,6 +38,8 @@ resource "aws_ecs_service" "backend_service" {
   desired_count   = var.min_instances
   launch_type     = "FARGATE"
 
+  enable_execute_command = true
+
   network_configuration {
     subnets          = var.private_subnet_ids
     security_groups  = [var.backend_tasks_sg_id]

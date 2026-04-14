@@ -25,3 +25,13 @@ output "frontend_bucket_name" {
 output "cloudfront_domain" {
   value = module.frontend_bucket.bucket_domain_name
 }
+
+output "rag_create_queue_url" {
+  description = "SQS queue URL for RAG creation"
+  value       = module.sqs_rag_create.rag_create_queue_url
+}
+
+output "rag_create_queue_arn" {
+  description = "SQS queue ARN for RAG creation"
+  value       = module.sqs_rag_create.rag_create_queue_arn
+}

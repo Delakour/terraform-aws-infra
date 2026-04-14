@@ -116,6 +116,13 @@ module "eventbridge_rag_weekly_update" {
   tags = var.tags
 }
 
+module "sqs_rag_create" {
+  source = "../../modules/sqs"
+
+  name = local.name_prefix
+  tags = var.tags
+}
+
 # module "ec2_app" {
 #   source = "../../modules/ec2"
 

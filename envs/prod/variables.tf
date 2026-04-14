@@ -36,18 +36,32 @@ variable "private_subnet_cidrs" {
   default = ["10.0.128.0/20", "10.0.144.0/20"]
 }
 
-variable "atlas_vpc_cidr" {
+variable "atlas_project_id" {
   type        = string
-  description = "CIDR block of the Atlas VPC to peer with"
-  default     = "192.168.0.0/21"
+  description = "MongoDB Atlas project ID"
+  default     = "69xxxxxxxxxxxxxxxxxxxxxx"
 }
 
-variable "atlas_peering_connection_id" {
+variable "atlas_cidr_block" {
   type        = string
-  description = "VPC peering connection ID for Atlas VPC"
-  default     = "pcx-xxxxxxxxxxxxxxxxxx"
+  description = "CIDR block for the Atlas network container. Must not overlap AWS VPC CIDR"
+  default     = "192.168.240.0/21"
 }
 
+variable "atlas_public_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "atlas_private_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "atlas_region" {
+  type = string
+  default = "EU_WEST_1"
+}
 variable "allowed_ssh_cidr" {
   type        = string
   description = "Your office IP/CIDR for SSH (e.g. 1.2.3.4/32)"
