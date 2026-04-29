@@ -19,6 +19,8 @@ locals {
     { name = "GOOGLE_JAVASCRIPT_ORIGINS", valueFrom = "/company/${var.environment}/GOOGLE_JAVASCRIPT_ORIGINS" },
     { name = "GOOGLE_REDIRECT_URIS", valueFrom = "/company/${var.environment}/GOOGLE_REDIRECT_URIS" },
     { name = "RAG_CREATE_QUEUE_URL", valueFrom = "/company/${var.environment}/RAG_CREATE_QUEUE_URL" },
+    { name = "PROXY_ENABLED", valueFrom = "/company/${var.environment}/PROXY_ENABLED"},
+    { name = "USE_SCRAPERAPI_DIRECT", valueFrom = "/company/${var.environment}/USE_SCRAPERAPI_DIRECT" },
     # global ssm
     { name = "AWS_ACCESS_KEY_ID", valueFrom = "/company/global/AWS_ACCESS_KEY_ID" },
     { name = "AWS_REGION", valueFrom = "/company/global/AWS_REGION" },
@@ -41,6 +43,10 @@ locals {
     { name = "LINKEDIN_RESTLI_PROTOCOL_VERSION", valueFrom = "/company/global/LINKEDIN_RESTLI_PROTOCOL_VERSION" },
     { name = "LINKEDIN_SCOPES", valueFrom = "/company/global/LINKEDIN_SCOPES" },
     { name = "MONGODB_NAME", valueFrom = "/company/global/MONGODB_NAME" },
-    { name = "OPENAI_API_KEY", valueFrom = "/company/global/OPENAI_API_KEY" }
+    { name = "OPENAI_API_KEY", valueFrom = "/company/global/OPENAI_API_KEY" },
+    { name = "RECRAFT_API_KEY", valueFrom = "/company/global/RECRAFT_API_KEY" },
+    { name = "IDEOGRAM_API_KEY", valueFrom = "/company/global/IDEOGRAM_API_KEY" },
+    { name = "PROXY_SERVER", valueFrom = "/company/global/PROXY_SERVER" },
+    { name = "SCRAPERAPI_KEY", valueFrom = "/company/global/SCRAPERAPI_KEY" }
   ]
 }

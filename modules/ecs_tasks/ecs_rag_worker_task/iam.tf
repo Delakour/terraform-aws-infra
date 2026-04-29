@@ -1,0 +1,92 @@
+data "aws_caller_identity" "current" {}
+
+# Execution Role (for pulling image, reading secrets)
+resource "aws_iam_role" "execution" {
+  name = "${var.name}-ecs-rag-worker-execution"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "execution_managed" {
+  role       = aws_iam_role.execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy" "execution_ssm" {
+  name = "${var.name}-ecs-rag-worker-execution-ssm"
+  role = aws_iam_role.execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "kms:Decrypt"
+      ]
+      Resource = [
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/global/*",
+        "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/company/${var.environment}/*"
+      ]
+    }]
+  })
+}
+
+# Task Role (for application permissions - S3, etc.)
+resource "aws_iam_role" "task" {
+  name = "${var.name}-ecs-rag-worker-task"
+
+  assume_role_policy = aws_iam_role.execution.assume_role_policy
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy" "task_s3" {
+  name = "${var.name}-ecs-rag-worker-task-s3"
+  role = aws_iam_role.task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ]
+      Resource = ["*"]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "task_ecs_exec" {
+  name = "${var.name}-ecs-rag-worker-ecs-exec"
+  role = aws_iam_role.task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}

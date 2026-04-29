@@ -80,7 +80,7 @@ module "ecs_backend" {
   ecr_repo_url        = module.ecr.repository_url
   ssm_params          = local.backend_secrets
   log_group_name      = "/ecs/${local.name_prefix}-backend-logs"
-  cluster_arn          = module.ecs_cluster.cluster_arn
+  cluster_arn         = module.ecs_cluster.cluster_arn
   cluster_name        = module.ecs_cluster.cluster_name
   min_instances       = 1
   max_instances       = 3
@@ -105,7 +105,7 @@ module "ecs_rag_weekly_update" {
 }
 
 module "eventbridge_rag_weekly_update" {
-  source = "../../modules/eventbridge"
+  source = "../../modules/eventbridge_scheduler"
 
   name                    = local.name_prefix
   cluster_arn             = module.ecs_cluster.cluster_arn
@@ -120,6 +120,37 @@ module "sqs_rag_create" {
   source = "../../modules/sqs"
 
   name = local.name_prefix
+  tags = var.tags
+}
+
+# RAG Worker Task Definition (dedicated for async RAG creation)
+module "ecs_rag_worker" {
+  source = "../../modules/ecs_tasks/ecs_rag_worker_task"
+
+  name           = local.name_prefix
+  region         = var.aws_region
+  environment    = var.environment
+  ssm_params     = local.backend_secrets
+  log_group_name = "/ecs/${local.name_prefix}-backend-logs"
+  backend_image  = local.backend_image
+
+  tags = var.tags
+}
+
+# EventBridge Pipes for SQS → ECS RunTask (RAG Worker)
+module "eventbridge_pipes_rag_worker" {
+  source = "../../modules/eventbridge_pipes"
+
+  name                        = local.name_prefix
+  region                      = var.aws_region
+  sqs_queue_arn               = module.sqs_rag_create.rag_create_queue_arn
+  ecs_cluster_arn             = module.ecs_cluster.cluster_arn
+  ecs_task_definition_arn     = module.ecs_rag_worker.task_definition_arn
+  ecs_task_execution_role_arn = module.ecs_rag_worker.execution_role_arn
+  ecs_task_role_arn           = module.ecs_rag_worker.task_role_arn
+  private_subnet_ids          = module.vpc.private_subnet_ids
+  security_group_id           = module.security.backend_sg_id
+
   tags = var.tags
 }
 

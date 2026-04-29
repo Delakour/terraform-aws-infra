@@ -35,3 +35,13 @@ output "rag_create_queue_arn" {
   description = "SQS queue ARN for RAG creation"
   value       = module.sqs_rag_create.rag_create_queue_arn
 }
+
+output "rag_worker_pipe_arn" {
+  description = "ARN of the EventBridge Pipe for RAG worker"
+  value       = module.eventbridge_pipes_rag_worker.pipe_arn
+}
+
+output "rag_worker_pipe_name" {
+  description = "Name of the EventBridge Pipe for RAG worker"
+  value       = module.eventbridge_pipes_rag_worker.pipe_name
+}
