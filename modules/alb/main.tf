@@ -11,10 +11,10 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "app_tg" {
-  name     = "${var.name}-tg"
-  port     = 8000
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.name}-tg"
+  port        = 8000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   lifecycle {
@@ -69,5 +69,50 @@ resource "aws_lb_listener" "https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app_tg.arn
+  }
+}
+
+resource "aws_lb_target_group" "onlyoffice_tg" {
+  count = var.onlyoffice_domain != "" ? 1 : 0
+
+  name        = "${var.name}-oo-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  health_check {
+    path                = var.onlyoffice_health_check_path
+    protocol            = "HTTP"
+    matcher             = "200-399"
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    interval            = 60
+    timeout             = 10
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.name}-oo-tg"
+  })
+}
+
+resource "aws_lb_listener_rule" "onlyoffice" {
+  count        = var.onlyoffice_domain != "" ? 1 : 0
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.onlyoffice_tg[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [var.onlyoffice_domain]
+    }
   }
 }

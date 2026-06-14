@@ -59,7 +59,7 @@ variable "atlas_private_key" {
 }
 
 variable "atlas_region" {
-  type = string
+  type    = string
   default = "EU_WEST_1"
 }
 variable "allowed_ssh_cidr" {
@@ -85,6 +85,18 @@ variable "health_check_path" {
   default     = "/health"
 }
 
+variable "onlyoffice_health_check_path" {
+  type        = string
+  description = "The health check path for the OnlyOffice service (default: /)"
+  default     = "/healthcheck"
+}
+
+variable "s3_cors_allowed_origins" {
+  type        = list(string)
+  description = "List of allowed origins for S3 CORS configuration"
+  default     = ["https://prod.domain.com"]
+}
+
 variable "frontend_domain" {
   type        = string
   description = "Frontend domain"
@@ -95,6 +107,12 @@ variable "backend_domain" {
   type        = string
   description = "Backend domain behind ALB"
   default     = "api.prod.domain.com"
+}
+
+variable "onlyoffice_domain" {
+  type        = string
+  description = "OO domain behind ALB"
+  default     = "onlyoffice.prod.domain.com"
 }
 
 variable "acm_certificate_arn" {

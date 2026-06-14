@@ -51,10 +51,10 @@ resource "null_resource" "update_pipe_ecs_override" {
     security_group_id   = var.security_group_id
   }
 
-provisioner "local-exec" {
-  interpreter = ["PowerShell", "-Command"]
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
 
-  command = <<EOT
+    command = <<EOT
     $payload = @{
       Name = "${aws_pipes_pipe.sqs_to_ecs.name}"
       RoleArn = "${aws_iam_role.eventbridge_pipe.arn}"
@@ -102,5 +102,5 @@ provisioner "local-exec" {
 
     Remove-Item -Path $file -Force
     EOT
-}
+  }
 }

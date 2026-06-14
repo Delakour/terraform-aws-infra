@@ -112,6 +112,22 @@ module "ecs_backend" {
   tags = var.tags
 }
 
+module "ecs_onlyoffice" {
+  source = "../../modules/ecs_tasks/ecs_onlyoffice_task"
+
+  name                   = local.name_prefix
+  region                 = var.aws_region
+  environment            = var.environment
+  log_group_name         = "/ecs/${local.name_prefix}-backend-logs"
+  cluster_arn            = module.ecs_cluster.cluster_arn
+  cluster_name           = module.ecs_cluster.cluster_name
+  private_subnet_ids     = module.vpc.private_subnet_ids
+  onlyoffice_tasks_sg_id = module.security.onlyoffice_sg_id
+  target_group_arn       = module.alb.onlyoffice_target_group_arn
+
+  tags = var.tags
+}
+
 module "ecs_rag_weekly_update" {
   source = "../../modules/ecs_tasks/ecs_rag_weekly_task"
 
@@ -204,9 +220,11 @@ module "alb" {
   target_instance_ids = {
     # app = module.ec2_app.instance_id
   }
-  health_check_path   = var.health_check_path
-  alb_certificate_arn = var.alb_certificate_arn
-  tags                = var.tags
+  health_check_path            = var.health_check_path
+  onlyoffice_health_check_path = var.onlyoffice_health_check_path
+  alb_certificate_arn          = var.alb_certificate_arn
+  onlyoffice_domain            = var.onlyoffice_domain
+  tags                         = var.tags
 }
 
 module "local_folder_bucket" {
@@ -227,15 +245,19 @@ module "story_portal_bucket" {
   source = "../../modules/s3"
 
   name = "${local.name_prefix}-story-portal"
+
+  cors_rules = [
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "HEAD"]
+      allowed_origins = var.s3_cors_allowed_origins
+      expose_headers  = []
+      max_age_seconds = 3000
+    }
+  ]
+
   tags = var.tags
 }
-
-# module "vectors_bucket" {
-#   source = "../../modules/s3"
-
-#   name = "${local.name_prefix}-vectors"
-#   tags = var.tags
-# }
 
 module "frontend_bucket" {
   source = "../../modules/s3"
@@ -280,3 +302,14 @@ resource "aws_route53_record" "backend_prod" {
   }
 }
 
+resource "aws_route53_record" "onlyoffice_prod" {
+  zone_id = data.terraform_remote_state.route53.outputs.hosted_zone_id
+  name    = var.onlyoffice_domain
+  type    = "A"
+
+  alias {
+    name                   = module.alb.alb_dns_name
+    zone_id                = module.alb.alb_zone_id
+    evaluate_target_health = true
+  }
+}

@@ -54,9 +54,21 @@ variable "root_volume_size" {
 }
 
 variable "health_check_path" {
-  type    = string
+  type        = string
   description = "The health check parameters for an ALB target group"
-  default = "/health"
+  default     = "/health"
+}
+
+variable "onlyoffice_health_check_path" {
+  type        = string
+  description = "The health check path for the OnlyOffice target group"
+  default     = "/healthcheck"
+}
+
+variable "s3_cors_allowed_origins" {
+  type        = list(string)
+  description = "List of allowed origins for S3 CORS configuration"
+  default     = ["http://localhost:5176", "https://dev.domain.com"]
 }
 
 variable "frontend_domain" {
@@ -71,16 +83,22 @@ variable "backend_domain" {
   default     = "api.dev.domain.com"
 }
 
+variable "onlyoffice_domain" {
+  type        = string
+  description = "OO domain behind ALB"
+  default     = "onlyoffice.dev.domain.com"
+}
+
 variable "acm_certificate_arn" {
   type        = string
   description = "ACM certificate ARN for *.domain.com (must be in us-east-1 for CloudFront)"
-  default = "arn:aws:acm:us-east-1:<account-id>:certificate/<certificate-id>"
+  default     = "arn:aws:acm:us-east-1:<account-id>:certificate/<certificate-id>"
 }
 
 variable "alb_certificate_arn" {
   type        = string
   description = "ACM certificate ARN for backend ALB (in app region, eu-north-1)"
-  default = "arn:aws:acm:<aws-region>:<account-id>:certificate/<certificate-id>"
+  default     = "arn:aws:acm:<aws-region>:<account-id>:certificate/<certificate-id>"
 }
 
 variable "tags" {

@@ -41,17 +41,17 @@ variable "cluster_arn" {
 
 variable "cluster_name" {
   description = "The ECS cluster name"
-  type = string
+  type        = string
 }
 
 variable "min_instances" {
   description = "minimum instances of task running"
-  type = number
+  type        = number
 }
 
 variable "max_instances" {
   description = "maximum instances of task running"
-  type = number
+  type        = number
 }
 
 variable "private_subnet_ids" {

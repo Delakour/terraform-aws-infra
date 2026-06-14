@@ -88,7 +88,7 @@ resource "aws_instance" "app" {
 
 resource "aws_ebs_volume" "vectors" {
   availability_zone = aws_instance.app.availability_zone
-  size              = 100            # GB – adjust
+  size              = 100 # GB – adjust
   type              = "gp3"
 
   tags = merge(var.tags, {

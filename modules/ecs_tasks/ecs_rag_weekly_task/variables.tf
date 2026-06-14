@@ -28,7 +28,7 @@ variable "log_group_name" {
 
 variable "backend_image" {
   description = "Docker backend image from ECR repository"
-  type = string
+  type        = string
 }
 
 variable "tags" {

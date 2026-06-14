@@ -22,10 +22,20 @@ variable "health_check_path" {
   type = string
 }
 
+variable "onlyoffice_health_check_path" {
+  type    = string
+  default = ""
+}
+
 variable "alb_certificate_arn" {
   type = string
 }
 
+variable "onlyoffice_domain" {
+  type        = string
+  description = "ONLYOFFICE domain for ALB listener rule"
+  default     = ""
+}
 variable "tags" {
   type = map(string)
 }

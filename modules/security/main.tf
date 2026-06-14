@@ -93,3 +93,29 @@ resource "aws_security_group" "backend_tasks" {
     Name = "${var.name}-sg-backend-tasks"
   })
 }
+
+resource "aws_security_group" "onlyoffice_tasks" {
+  name        = "${var.name}-onlyoffice-tasks-sg"
+  description = "Security group for OnlyOffice ECS tasks"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description     = "Allow ALB to reach OnlyOffice"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  egress {
+    description = "Allow outbound (S3 presigned URLs, OO internal)"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.name}-sg-onlyoffice-tasks"
+  })
+}

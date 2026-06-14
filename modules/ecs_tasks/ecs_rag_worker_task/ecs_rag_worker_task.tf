@@ -20,7 +20,7 @@ resource "aws_ecs_task_definition" "rag_worker" {
         "app.application.jobs.rag_worker",
         "--mode",
         "single"
-    ]
+      ]
 
       environment = [
         {

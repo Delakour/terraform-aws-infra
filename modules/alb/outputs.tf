@@ -13,3 +13,7 @@ output "alb_zone_id" {
 output "target_group_arn" {
   value = aws_lb_target_group.app_tg.arn
 }
+
+output "onlyoffice_target_group_arn" {
+  value = try(aws_lb_target_group.onlyoffice_tg[0].arn, "")
+}

@@ -4,8 +4,8 @@ resource "aws_sqs_queue" "rag_create_dlq" {
 
 resource "aws_sqs_queue" "rag_create" {
   name                       = "${var.name}-rag-create"
-  visibility_timeout_seconds = 4200   # 70 min
-  receive_wait_time_seconds  = 20     # long polling
+  visibility_timeout_seconds = 4200 # 70 min
+  receive_wait_time_seconds  = 20   # long polling
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.rag_create_dlq.arn
@@ -24,8 +24,8 @@ resource "aws_iam_policy" "backend_send_rag_jobs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["sqs:SendMessage"]
+        Effect   = "Allow"
+        Action   = ["sqs:SendMessage"]
         Resource = aws_sqs_queue.rag_create.arn
       }
     ]
