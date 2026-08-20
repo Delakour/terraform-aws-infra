@@ -43,7 +43,7 @@ resource "aws_ecs_service" "onlyoffice_service" {
   name            = "${var.name}-onlyoffice-service"
   cluster         = var.cluster_arn
   task_definition = aws_ecs_task_definition.onlyoffice_task.arn
-  desired_count   = 1
+  desired_count   = 0
   launch_type     = "FARGATE"
 
   enable_execute_command = true

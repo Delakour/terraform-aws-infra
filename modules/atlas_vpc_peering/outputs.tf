@@ -17,3 +17,10 @@ output "atlas_cidr_block" {
   value       = var.atlas_cidr_block
   description = "Atlas CIDR block routed from AWS"
 }
+
+output "atlas_routes" {
+  value = {
+    for route_table_id, route in aws_route.atlas_routes : route_table_id => route.id
+  }
+  description = "AWS route IDs created for Atlas peering by route table ID"
+}

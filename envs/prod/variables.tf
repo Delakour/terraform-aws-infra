@@ -36,48 +36,24 @@ variable "private_subnet_cidrs" {
   default = ["10.0.128.0/20", "10.0.144.0/20"]
 }
 
-variable "atlas_project_id" {
-  type        = string
-  description = "MongoDB Atlas project ID"
-  default     = "69xxxxxxxxxxxxxxxxxxxxxx"
-}
-
-variable "atlas_cidr_block" {
-  type        = string
-  description = "CIDR block for the Atlas network container. Must not overlap AWS VPC CIDR"
-  default     = "192.168.240.0/21"
-}
-
-variable "atlas_public_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "atlas_private_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "atlas_region" {
-  type    = string
-  default = "EU_WEST_1"
-}
 variable "allowed_ssh_cidr" {
   type        = string
   description = "Your office IP/CIDR for SSH (e.g. 1.2.3.4/32)"
   default     = ""
 }
 
-variable "instance_type" {
-  type    = string
-  default = "t3.small"
-}
+# Kept as reference for the currently disabled EC2 path.
+# variable "instance_type" {
+#   type    = string
+#   default = "t3.small"
+# }
 
-variable "root_volume_size" {
-  type        = number
-  description = "Root EBS size in GB"
-  default     = 30
-}
+# Kept as reference for the currently disabled EC2 path.
+# variable "root_volume_size" {
+#   type        = number
+#   description = "Root EBS size in GB"
+#   default     = 30
+# }
 
 variable "health_check_path" {
   type        = string

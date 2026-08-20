@@ -42,16 +42,18 @@ variable "allowed_ssh_cidr" {
   default     = "37.186.124.179/32"
 }
 
-variable "instance_type" {
-  type    = string
-  default = "t3.small"
-}
+# Kept as reference for the currently disabled EC2 path.
+# variable "instance_type" {
+#   type    = string
+#   default = "t3.small"
+# }
 
-variable "root_volume_size" {
-  type        = number
-  description = "Root EBS size in GB"
-  default     = 30
-}
+# Kept as reference for the currently disabled EC2 path.
+# variable "root_volume_size" {
+#   type        = number
+#   description = "Root EBS size in GB"
+#   default     = 30
+# }
 
 variable "health_check_path" {
   type        = string

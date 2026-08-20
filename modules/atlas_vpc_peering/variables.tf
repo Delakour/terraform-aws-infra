@@ -42,12 +42,6 @@ variable "route_table_ids" {
   description = "Route tables that need a route to Atlas CIDR, usually private route tables"
 }
 
-variable "create_atlas_ip_access_list" {
-  type        = bool
-  description = "Whether to add AWS VPC CIDR to Atlas project IP access list"
-  default     = false
-}
-
 variable "atlas_ip_access_list_comment" {
   type        = string
   description = "Comment for Atlas IP access list entry"

@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 data "terraform_remote_state" "route53" {
   backend = "s3"
 
@@ -34,25 +32,6 @@ module "vpc" {
   public_subnets  = var.public_subnet_cidrs
   private_subnets = var.private_subnet_cidrs
   tags            = var.tags
-}
-
-module "atlas_vpc_peering" {
-  source = "../../modules/atlas_vpc_peering"
-
-  name             = local.name_prefix
-  atlas_project_id = var.atlas_project_id
-  atlas_region     = var.atlas_region
-  atlas_cidr_block = var.atlas_cidr_block
-
-  aws_region      = var.aws_region
-  aws_account_id  = data.aws_caller_identity.current.account_id
-  vpc_id          = module.vpc.vpc_id
-  vpc_cidr_block  = module.vpc.vpc_cidr_block
-  route_table_ids = [module.vpc.private_route_table_id]
-
-  create_atlas_ip_access_list = true
-
-  tags = var.tags
 }
 
 module "security" {

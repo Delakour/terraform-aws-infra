@@ -24,10 +24,13 @@ locals {
     { name = "USE_SCRAPERAPI_DIRECT", valueFrom = "/company/${var.environment}/USE_SCRAPERAPI_DIRECT" },
     { name = "ONLYOFFICE_SERVER_URL", valueFrom = "/company/${var.environment}/ONLYOFFICE_SERVER_URL" },
     { name = "ONLYOFFICE_CALLBACK_BASE_URL", valueFrom = "/company/${var.environment}/ONLYOFFICE_CALLBACK_BASE_URL" },
+    { name = "FRONTEND_URL", valueFrom = "/company/${var.environment}/FRONTEND_URL" },
     # global ssm
     { name = "AWS_ACCESS_KEY_ID", valueFrom = "/company/global/AWS_ACCESS_KEY_ID" },
     { name = "AWS_REGION", valueFrom = "/company/global/AWS_REGION" },
     { name = "AWS_SECRET_ACCESS_KEY", valueFrom = "/company/global/AWS_SECRET_ACCESS_KEY" },
+    { name = "BREVO_USER", valueFrom = "/company/global/BREVO_USER" },
+    { name = "BREVO_PASSWORD", valueFrom = "/company/global/BREVO_PASSWORD" },
     { name = "COHERE_API_KEY", valueFrom = "/company/global/COHERE_API_KEY" },
     { name = "DATABASE_NAME", valueFrom = "/company/global/DATABASE_NAME" },
     { name = "FERNET_KEY", valueFrom = "/company/global/FERNET_KEY" },
